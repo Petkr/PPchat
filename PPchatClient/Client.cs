@@ -82,6 +82,9 @@ namespace PPchatClient
 			try
 			{
 				connection = new ClientConnection(this, ipAddress, port);
+				Write("enter your username:");
+				var username = Read();
+				connection.Stream.Write(new LoginPacket(username));
 			}
 			catch
 			{

@@ -43,7 +43,7 @@ namespace PPchatLibrary
 					return ReturnJustOne(commandsInfo.BadArgumentCountCommand, arguments.Length);
 			}
 			else
-				return ReturnJustOne(commandsInfo.NotFoundCommand, s);
+				return ReturnJustOne(commandsInfo.NotFoundCommand, s.TrimStart());
 		}
 
 		public (IInvoker<IApplication, object[]>, object[]) Parse(string input)

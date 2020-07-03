@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 
 namespace PPchatServer
 {
@@ -43,7 +44,6 @@ namespace PPchatServer
 					break;
 				}
 				var connection = new ServerConnection(this, tcpClient);
-				connection.Stream.Write(new MessageForClientPacket("server says hi!"));
 				Write("a client connected");
 				connections.Add(connection);
 			}
@@ -56,14 +56,8 @@ namespace PPchatServer
 			acceptConnectionsThread = null;
 		}
 
-		public void HandleIncomingMessage(IConnection fromConnection, string message)
-		{
-			Write($"client said: {message}");
-
-			foreach (var connection in Connections)
-				if (connection != fromConnection)
-					connection.Stream.Write(new MessageForClientPacket(message));
-		}
+		public IEnumerable<IConnection> OtherConnectionsThan(IConnection connection) =>
+			Connections.Where(x => x != connection);
 
 		protected override void HandleAfterExit() => StopListening();
 

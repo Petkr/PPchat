@@ -18,6 +18,13 @@ namespace PPchatLibrary
 		{
 			return Console.ReadLine()!;
 		}
+
+		public void WriteDebug(string s)
+		{
+#if DEBUG
+			Write(s);
+#endif
+		}
 		protected abstract IEnumerable<IConnection> Connections { get; }
 		protected abstract void ClearConnections();
 		public abstract void RemoveConnection(IConnection connection);
