@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace PPchatLibrary
 {
@@ -18,7 +19,16 @@ namespace PPchatLibrary
 		}
 
 		public void Invoke(IApplication application, object[]? parameters)
-			=> Invoke(application, (ICommandArgument)Activator.CreateInstance(CommandArgumentType, parameters)!);
+		{
+			try
+			{
+				Invoke(application, (ICommandArgument)Activator.CreateInstance(CommandArgumentType, parameters)!);
+			}
+			catch (TargetInvocationException e)
+			{
+				throw e.GetBaseException();
+			}
+		}
 	}
 
 	class CommandDescriptor<Application, CommandArgument> : CommandDescriptor<Application>

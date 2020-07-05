@@ -20,8 +20,5 @@ namespace PPchatLibrary
 			OneLongArgument = oneLongArgument;
 			Priority = 0;
 		}
-		public CommandAttribute()
-			: this("")
-		{ }
 	}
 }
