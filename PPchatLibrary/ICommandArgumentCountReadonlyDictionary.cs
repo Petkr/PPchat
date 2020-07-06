@@ -4,6 +4,6 @@ namespace PPchatLibrary
 {
 	interface ICommandArgumentCountReadonlyDictionary : ISimpleReadonlyDictionary<int, IEnumerable<ICommandDescriptor>>
 	{
-		ICommandDescriptor? GetOneIfOneLongArgument { get; }
+		ISimpleCollection<ICommandDescriptor>? GetIfOneLongArgument { get; }
 	}
 }

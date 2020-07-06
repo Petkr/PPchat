@@ -11,11 +11,14 @@ namespace PPchatLibrary
 		static readonly ICommandsInfo commandsInfo = new CommandsSniffer<Application>();
 		static readonly object[] arrayHelper = new object[1];
 
-		static InvokersParametersPair JustOne(ICommandDescriptor command, object o)
+		static InvokersParametersPair JustOne(IEnumerable<IInvoker<IApplication, object[]>> commands, object o)
 		{
 			arrayHelper[0] = o;
-			return (command.AsSingleEnumerable(), arrayHelper);
+			return (commands, arrayHelper);
 		}
+
+		static InvokersParametersPair JustOne(ICommandDescriptor command, object o)
+			=> JustOne(command.AsSingleEnumerable(), o);
 		
 		static InvokersParametersPair ParseImplementation(string s)
 		{
@@ -26,7 +29,7 @@ namespace PPchatLibrary
 			if (commands != null)
 			{
 				{
-					var command = commands.GetOneIfOneLongArgument;
+					var command = commands.GetIfOneLongArgument;
 					if (command != null)
 						return JustOne(command, tail);
 				}
