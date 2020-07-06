@@ -4,8 +4,8 @@ using System.Linq;
 
 namespace PPchatLibrary
 {
-	abstract class BasicInfo<Key, Info, TypeToScan> : IInfo<Key, Info>
-		where Info : class
+	abstract class BasicInfo<Key, Value, TypeToScan> : ISimpleDictionary<Key, Value>
+		where Value : class
 		where Key : notnull
 	{
 		protected static IEnumerable<Type> GetImplementedInterfaces<Implementation>(Type genericInterfaceDefinitionType)
@@ -13,11 +13,11 @@ namespace PPchatLibrary
 			.Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterfaceDefinitionType)
 			.Select(x => x.GetGenericArguments()[0]);
 
-		readonly IDictionary<Key, Info> Map;
+		readonly IDictionary<Key, Value> Map;
 
 		public BasicInfo(Type genericInterfaceDefinitionType)
 		{
-			Map = new Dictionary<Key, Info>();
+			Map = new Dictionary<Key, Value>();
 
 			foreach (var t in GetImplementedInterfaces<TypeToScan>(genericInterfaceDefinitionType))
 				Handle(t);
@@ -25,10 +25,10 @@ namespace PPchatLibrary
 
 		protected abstract void Handle(Type type);
 
-		protected void AddInfo(Key from, Info to)
+		public void Add(Key from, Value to)
 			=> Map.Add(from, to);
 
-		public Info? GetInfo(Key from)
+		public Value? GetValue(Key from)
 		{
 			Map.TryGetValue(from, out var result);
 			return result;
