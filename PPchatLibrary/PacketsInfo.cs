@@ -10,6 +10,6 @@ namespace PPchatLibrary
 		{ }
 
 		protected override void Handle(Type packetType)
-			=> AddInfo(packetType, new BasicDescriptor<IConnection, IPacket, Connection>(typeof(IPacketHandler<>), packetType));
+			=> Add(packetType, new BasicDescriptor<IConnection, IPacket, Connection>(typeof(IPacketHandler<>), packetType));
 	}
 }

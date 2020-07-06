@@ -2,7 +2,7 @@
 
 namespace PPchatLibrary
 {
-	interface ICommandsInfo : IInfo<string, IEnumerable<ICommandDescriptor>>
+	interface ICommandsInfo : ISimpleReadonlyDictionary<string, ICommandArgumentCountReadonlyDictionary>
 	{
 		ICommandDescriptor NotFoundCommand { get; }
 		ICommandDescriptor BadArgumentCountCommand { get; }

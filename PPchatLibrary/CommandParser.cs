@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PPchatLibrary
 {
@@ -12,7 +11,7 @@ namespace PPchatLibrary
 		static readonly ICommandsInfo commandsInfo = new CommandsInfo<Application>();
 		static readonly object[] arrayHelper = new object[1];
 
-		static InvokersParametersPair ReturnJustOne(ICommandDescriptor command, object o)
+		static InvokersParametersPair JustOne(ICommandDescriptor command, object o)
 		{
 			arrayHelper[0] = o;
 			return (command.AsSingleEnumerable(), arrayHelper);
@@ -22,28 +21,25 @@ namespace PPchatLibrary
 		{
 			var (head, tail) = Split(s);
 
-			var commands = commandsInfo.GetInfo(head);
+			var commands = commandsInfo.GetValue(head);
 
 			if (commands != null)
 			{
-				if (commands.Any())
 				{
-					var first = commands.First();
-					if (first.ArgumentCount == -1)
-						return ReturnJustOne(first, tail);
+					var command = commands.GetOneIfOneLongArgument;
+					if (command != null)
+						return JustOne(command, tail);
 				}
-				else
-					throw new Exception("Empty command enumerable for a command name.");
 
 				var arguments = tail.Split(' ', 5, StringSplitOptions.RemoveEmptyEntries);
-				var commandsWithRightArgumentCount = commands.Where(x => x.ArgumentCount == arguments.Length);
-				if (commandsWithRightArgumentCount.Any())
+				var commandsWithRightArgumentCount = commands.GetValue(arguments.Length);
+				if (commandsWithRightArgumentCount != null)
 					return (commandsWithRightArgumentCount, arguments);
 				else
-					return ReturnJustOne(commandsInfo.BadArgumentCountCommand, arguments.Length);
+					return JustOne(commandsInfo.BadArgumentCountCommand, arguments.Length);
 			}
 			else
-				return ReturnJustOne(commandsInfo.NotFoundCommand, s.TrimStart());
+				return JustOne(commandsInfo.NotFoundCommand, s.TrimStart());
 		}
 
 		public (IInvoker<IApplication, object[]>, object[]) Parse(string input)
