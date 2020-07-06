@@ -1,6 +1,6 @@
 ﻿namespace PPchatLibrary
 {
-	[Command("exit")]
+	[Command("exit", CommandFlags.UniqueName)]
 	public struct ExitCommandArgument : ICommandArgument
 	{}
 }
