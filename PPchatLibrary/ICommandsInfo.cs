@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace PPchatLibrary
+﻿namespace PPchatLibrary
 {
-	interface ICommandsInfo : ISimpleReadonlyDictionary<string, ICommandArgumentCountReadonlyDictionary>
+	interface ICommandsSniffer : ISimpleReadonlyDictionary<string, ICommandArgumentCountReadonlyDictionary>
 	{
 		ICommandDescriptor NotFoundCommand { get; }
 		ICommandDescriptor BadArgumentCountCommand { get; }

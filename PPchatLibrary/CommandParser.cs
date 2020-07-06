@@ -8,7 +8,7 @@ namespace PPchatLibrary
 	class CommandParser<Application> : IParser<IApplication, string, object[]>
 		where Application : IApplication
 	{
-		static readonly ICommandsInfo commandsInfo = new CommandsSniffer<Application>();
+		static readonly ICommandsSniffer commandsSniffer = new CommandsSniffer<Application>();
 		static readonly object[] arrayHelper = new object[1];
 
 		static InvokersParametersPair JustOne(IEnumerable<IInvoker<IApplication, object[]>> commands, object o)
@@ -24,14 +24,14 @@ namespace PPchatLibrary
 		{
 			var (head, tail) = Split(s);
 
-			var commands = commandsInfo.GetValue(head);
+			var commands = commandsSniffer.GetValue(head);
 
 			if (commands != null)
 			{
 				{
 					var command = commands.GetIfOneLongArgument;
 					if (command != null)
-						return JustOne(command, tail);
+						return JustOne(command, tail.TrimStart());
 				}
 
 				var arguments = tail.Split(' ', 5, StringSplitOptions.RemoveEmptyEntries);
@@ -39,10 +39,10 @@ namespace PPchatLibrary
 				if (commandsWithRightArgumentCount != null)
 					return (commandsWithRightArgumentCount, arguments);
 				else
-					return JustOne(commandsInfo.BadArgumentCountCommand, arguments.Length);
+					return JustOne(commandsSniffer.BadArgumentCountCommand, arguments.Length);
 			}
 			else
-				return JustOne(commandsInfo.NotFoundCommand, s.TrimStart());
+				return JustOne(commandsSniffer.NotFoundCommand, s.TrimStart());
 		}
 
 		public (IInvoker<IApplication, object[]>, object[]) Parse(string input)

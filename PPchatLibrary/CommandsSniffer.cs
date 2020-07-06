@@ -4,9 +4,7 @@ using System.Reflection;
 
 namespace PPchatLibrary
 {
-
-
-	class CommandsSniffer<Application> : BasicSniffer<string, ICommandArgumentCountDictionary, Application>, ICommandsInfo
+	class CommandsSniffer<Application> : BasicSniffer<string, ICommandArgumentCountDictionary, Application>, ICommandsSniffer
 		where Application : IApplication
 	{
 		public ICommandDescriptor NotFoundCommand { get; }
@@ -26,7 +24,7 @@ namespace PPchatLibrary
 				return;
 
 			var attribute = commandArgumentType.GetCustomAttribute<CommandAttribute>()!;
-			var argumentCount = attribute.HasOneLongArgument ? -1 : commandArgumentType.GetFields().Length;
+			var argumentCount = attribute.HasOneLongArgument ? 0 : commandArgumentType.GetFields().Length;
 			var command = new CommandDescriptor<Application>(commandArgumentType, argumentCount, attribute.Priority);
 
 			if (attribute.HasUniqueName)
