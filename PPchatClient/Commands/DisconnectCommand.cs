@@ -2,7 +2,7 @@
 
 namespace PPchatClient.Commands
 {
-	[Command("disconnect")]
+	[Command("disconnect", CommandFlags.UniqueName)]
 	public readonly struct DisconnectCommandArgument : ICommandArgument
 	{ }
 }

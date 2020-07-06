@@ -2,7 +2,7 @@
 
 namespace PPchatClient.Commands
 {
-	[Command("port")]
+	[Command("port", CommandFlags.UniqueArgumentCount)]
 	public readonly struct PrintPortCommandArgument : ICommandArgument
 	{ }
 }

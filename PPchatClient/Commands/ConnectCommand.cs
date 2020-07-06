@@ -3,7 +3,7 @@ using PPchatLibrary;
 
 namespace PPchatClient
 {
-	[Command("connect")]
+	[Command("connect", CommandFlags.UniqueArgumentCount)]
 	public readonly struct ConnectCommandArgument : ICommandArgument
 	{
 		public readonly IPAddress ipAddress;

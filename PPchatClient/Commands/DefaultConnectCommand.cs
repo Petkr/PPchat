@@ -2,7 +2,7 @@
 
 namespace PPchatClient
 {
-	[Command("connect")]
+	[Command("connect", CommandFlags.UniqueArgumentCount)]
 	public readonly struct DefaultConnectCommandArgument : ICommandArgument
 	{ }
 }

@@ -2,7 +2,7 @@
 
 namespace PPchatClient
 {
-	[Command("say", true)]
+	[Command("say", CommandFlags.OneLongArgument | CommandFlags.UniqueName)]
 	public readonly struct SayCommandArgument : ICommandArgument
 	{
 		public readonly string Message;
