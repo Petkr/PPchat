@@ -2,10 +2,10 @@
 
 namespace PPchatLibrary
 {
-	class PacketsInfo<Connection> : BasicInfo<Type, IInvoker<IConnection, IPacket>, Connection>
+	class PacketsSniffer<Connection> : BasicSniffer<Type, IInvoker<IConnection, IPacket>, Connection>
 		where Connection : IConnection
 	{
-		public PacketsInfo()
+		public PacketsSniffer()
 			: base(typeof(IPacketHandler<>))
 		{ }
 

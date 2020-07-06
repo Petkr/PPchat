@@ -6,13 +6,13 @@ namespace PPchatLibrary
 {
 
 
-	class CommandsInfo<Application> : BasicInfo<string, ICommandArgumentCountDictionary, Application>, ICommandsInfo
+	class CommandsSniffer<Application> : BasicSniffer<string, ICommandArgumentCountDictionary, Application>, ICommandsInfo
 		where Application : IApplication
 	{
 		public ICommandDescriptor NotFoundCommand { get; }
 		public ICommandDescriptor BadArgumentCountCommand { get; }
 
-		public CommandsInfo()
+		public CommandsSniffer()
 			: base(typeof(ICommandHandler<>))
 		{
 			NotFoundCommand = new CommandDescriptor<Application, NotFoundCommandArgument>();

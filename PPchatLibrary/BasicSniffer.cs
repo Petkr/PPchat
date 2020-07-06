@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PPchatLibrary
 {
-	abstract class BasicInfo<Key, Value, TypeToScan> : ISimpleDictionary<Key, Value>
+	abstract class BasicSniffer<Key, Value, TypeToScan> : ISimpleDictionary<Key, Value>
 		where Value : class
 		where Key : notnull
 	{
@@ -15,7 +15,7 @@ namespace PPchatLibrary
 
 		readonly IDictionary<Key, Value> Map;
 
-		public BasicInfo(Type genericInterfaceDefinitionType)
+		public BasicSniffer(Type genericInterfaceDefinitionType)
 		{
 			Map = new Dictionary<Key, Value>();
 

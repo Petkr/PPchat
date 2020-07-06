@@ -8,7 +8,7 @@ namespace PPchatLibrary
 	class CommandParser<Application> : IParser<IApplication, string, object[]>
 		where Application : IApplication
 	{
-		static readonly ICommandsInfo commandsInfo = new CommandsInfo<Application>();
+		static readonly ICommandsInfo commandsInfo = new CommandsSniffer<Application>();
 		static readonly object[] arrayHelper = new object[1];
 
 		static InvokersParametersPair JustOne(ICommandDescriptor command, object o)
