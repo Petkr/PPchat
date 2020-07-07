@@ -11,18 +11,18 @@ namespace PPchatLibrary
 		static readonly ICommandsSniffer commandsSniffer = new CommandsSniffer<Application>();
 		static readonly object[] arrayHelper = new object[1];
 
-		static InvokersParametersPair JustOne(IEnumerable<IInvoker<IApplication, object[]>> commands, object o)
+		static InvokersParametersPair JustOneArgument(IEnumerable<IInvoker<IApplication, object[]>> commands, object o)
 		{
 			arrayHelper[0] = o;
 			return (commands, arrayHelper);
 		}
 
-		static InvokersParametersPair JustOne(ICommandDescriptor command, object o)
-			=> JustOne(command.AsSingleEnumerable(), o);
+		static InvokersParametersPair JustOneArgument(ICommandDescriptor command, object o)
+			=> JustOneArgument(command.AsSingleEnumerable(), o);
 		
 		static InvokersParametersPair ParseImplementation(string s)
 		{
-			var (head, tail) = Split(s);
+			var (head, tail) = SplitFirstToken(s);
 
 			var commands = commandsSniffer.GetValue(head);
 
@@ -31,7 +31,7 @@ namespace PPchatLibrary
 				{
 					var command = commands.GetIfOneLongArgument;
 					if (command != null)
-						return JustOne(command, tail.TrimStart());
+						return JustOneArgument(command, tail.TrimStart());
 				}
 
 				var arguments = tail.Split(' ', 5, StringSplitOptions.RemoveEmptyEntries);
@@ -39,10 +39,10 @@ namespace PPchatLibrary
 				if (commandsWithRightArgumentCount != null)
 					return (commandsWithRightArgumentCount, arguments);
 				else
-					return JustOne(commandsSniffer.BadArgumentCountCommand, arguments.Length);
+					return JustOneArgument(commandsSniffer.BadArgumentCountCommand, arguments.Length);
 			}
 			else
-				return JustOne(commandsSniffer.NotFoundCommand, s.TrimStart());
+				return JustOneArgument(commandsSniffer.NotFoundCommand, s.TrimStart());
 		}
 
 		public (IInvoker<IApplication, object[]>, object[]) Parse(string input)
@@ -51,7 +51,7 @@ namespace PPchatLibrary
 			return (new EnumerableInvoker<IApplication, object[]>(commands), arguments);
 		}
 
-		static (string head, string tail) Split(string s)
+		static (string head, string tail) SplitFirstToken(string s)
 		{
 			var index = s.IndexOf(' ');
 			if (index != -1)
