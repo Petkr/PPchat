@@ -75,7 +75,7 @@ namespace PPchatLibrary
 
 		public void Handle(BadArgumentCountCommandArgument argument)
 		{
-			Write($"bad argument count: {argument.count}");
+			Write($"bad argument count: {argument.Count}");
 		}
 
 		public void Handle(ExitCommandArgument _)
