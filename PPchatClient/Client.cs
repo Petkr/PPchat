@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Linq;
+using System.Collections.Generic;
 using PPchatLibrary;
-using PPchatClient.Commands;
-using System.IO;
-using System;
 
 namespace PPchatClient
 {
@@ -41,12 +40,28 @@ namespace PPchatClient
 
 			using var serializer = new SimpleSerializerStream(new FileStream(savedServersPath, FileMode.CreateNew));
 
+			serializer.Write(savedServers.Count);
 			foreach (var (key, value) in savedServers)
 			{
 				serializer.Write(key);
 				serializer.Write(value);
 			}
 		}
+
+		static IEnumerable<(string key, (IPAddress, int) value)> DeserializeSavedServersImplementation(SimpleSerializerStream serializer)
+		{
+			var count = serializer.Read<int>();
+
+			(string key, (IPAddress, int) value) pair;
+
+			for (int i = 0; i != count; ++i)
+			{
+				pair.key = serializer.Read<string>();
+				pair.value = serializer.ReadPair<IPAddress, int>();
+				yield return pair;
+			}
+		}
+
 		static IDictionary<string, (IPAddress, int)> DeserializeSavedServers()
 		{
 			IDictionary<string, (IPAddress, int)> saved_servers = new Dictionary<string, (IPAddress, int)>();
@@ -55,17 +70,8 @@ namespace PPchatClient
 			{
 				using var serializer = new SimpleSerializerStream(new FileStream(savedServersPath, FileMode.Open));
 
-				(string key, (IPAddress, int) value) tuple;
-
-				while (true)
-				{
-					try	{ tuple.key = serializer.Read<string>(); }
-					catch (SimpleSerializerEndOfStreamException) { break; }
-
-					tuple.value = serializer.ReadPair<IPAddress, int>();
-
-					saved_servers.Add(tuple.key, tuple.value);
-				}
+				foreach (var (key, value) in DeserializeSavedServersImplementation(serializer))
+					saved_servers.Add(key, value);
 			}
 
 			return saved_servers;

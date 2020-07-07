@@ -1,6 +1,6 @@
 ﻿using PPchatLibrary;
 
-namespace PPchatClient.Commands
+namespace PPchatClient
 {
 	[Command("disconnect", CommandFlags.UniqueName)]
 	public readonly struct DisconnectCommandArgument : ICommandArgument

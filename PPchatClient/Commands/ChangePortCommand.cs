@@ -1,6 +1,6 @@
 ﻿using PPchatLibrary;
 
-namespace PPchatClient.Commands
+namespace PPchatClient
 {
 	[Command("port", CommandFlags.UniqueArgumentCount)]
 	public readonly struct ChangePortCommandArgument : ICommandArgument

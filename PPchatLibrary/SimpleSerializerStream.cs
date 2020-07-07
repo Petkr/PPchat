@@ -3,7 +3,6 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Net;
-using System.Collections.Generic;
 
 namespace PPchatLibrary
 {
@@ -42,14 +41,6 @@ namespace PPchatLibrary
 			var t = Read<T>();
 			var u = Read<U>();
 			return (t, u);
-		}
-
-		public void Write<Key, Value>(KeyValuePair<Key, Value> pair)
-			=> Write((pair.Key, pair.Value));
-		public KeyValuePair<Key, Value> ReadKeyValuePair<Key, Value>()
-		{
-			var (key, value) = ReadPair<Key, Value>();
-			return new KeyValuePair<Key, Value>(key, value);
 		}
 
 
