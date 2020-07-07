@@ -4,7 +4,7 @@
 	{
 		static void Main(string[] _)
 		{
-			var client = new Client();
+			using var client = new Client();
 			client.AcceptCommands();
 		}
 	}
