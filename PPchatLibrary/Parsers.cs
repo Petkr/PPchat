@@ -5,14 +5,14 @@ namespace PPchatLibrary
 	class PortOutOfRangeParseException : ParseException
 	{
 		public PortOutOfRangeParseException(int port)
-			: base($"Port {port} is out of range, should be < 65,536 and >= 0")
+			: base($"Port {port} is out of range, should be <= {IPEndPoint.MaxPort} and >= {IPEndPoint.MinPort}.")
 		{}
 	}
 
 	class PortIntParseException : ParseException
 	{
 		public PortIntParseException(string portString)
-			: base($"Port {portString} is not a valid format for a port. Should be a number, < 65,536 and >= 0.")
+			: base($"Port {portString} is not a valid format for a port. Should be a number, <= {IPEndPoint.MaxPort} and >= {IPEndPoint.MinPort}.")
 		{}
 	}
 
