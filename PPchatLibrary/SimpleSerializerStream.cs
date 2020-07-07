@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Net;
+using System.Collections.Generic;
 
 namespace PPchatLibrary
 {
@@ -36,12 +37,19 @@ namespace PPchatLibrary
 			Write(pair.Item1);
 			Write(pair.Item2);
 		}
-
 		public (T, U) ReadPair<T, U>()
 		{
 			var t = Read<T>();
 			var u = Read<U>();
 			return (t, u);
+		}
+
+		public void Write<Key, Value>(KeyValuePair<Key, Value> pair)
+			=> Write((pair.Key, pair.Value));
+		public KeyValuePair<Key, Value> ReadKeyValuePair<Key, Value>()
+		{
+			var (key, value) = ReadPair<Key, Value>();
+			return new KeyValuePair<Key, Value>(key, value);
 		}
 
 
@@ -94,7 +102,7 @@ namespace PPchatLibrary
 		{
 			Span<byte> span = stackalloc byte[sizeof(int)];
 			if (Stream.Read(span) != sizeof(int))
-				throw new Exception();
+				throw new SimpleSerializerEndOfStreamException();
 			return MemoryMarshal.Read<int>(span);
 		}
 
