@@ -1,12 +1,12 @@
 ﻿namespace PPchatLibrary
 {
-	public struct BadArgumentCountCommandArgument : ICommandArgument
+	public readonly struct BadArgumentCountCommandArgument : ICommandArgument
 	{
-		public int count;
+		public readonly int Count;
 
 		public BadArgumentCountCommandArgument(int count)
 		{
-			this.count = count;
+			Count = count;
 		}
 	}
 }
