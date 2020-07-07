@@ -62,7 +62,7 @@ namespace PPchatClient
 					try	{ tuple.key = serializer.Read<string>(); }
 					catch (SimpleSerializerEndOfStreamException) { break; }
 
-					tuple.value = serializer.Read<(IPAddress, int)>();
+					tuple.value = serializer.ReadPair<IPAddress, int>();
 
 					saved_servers.Add(tuple.key, tuple.value);
 				}
