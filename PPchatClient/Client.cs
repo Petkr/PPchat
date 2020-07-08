@@ -183,7 +183,10 @@ namespace PPchatClient
 
 		public void Handle(SaveServerCommandArgument argument)
 		{
-			savedServers.Add(argument.ServerName, (argument.Address, argument.Port));
+			if (savedServers.TryAdd(argument.ServerName, (argument.Address, argument.Port)))
+				Write($"successfully saved new server {argument.ServerName}");
+			else
+				Write($"there is already a saved server named {argument.ServerName}");
 		}
 
 		public void Handle(SimpleConnectSavedServerCommandArgument argument)
