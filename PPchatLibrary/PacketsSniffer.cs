@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PPchatLibrary
 {
@@ -6,7 +7,7 @@ namespace PPchatLibrary
 		where Connection : IConnection
 	{
 		public PacketsSniffer()
-			: base(typeof(IPacketHandler<>))
+			: base(new Dictionary<Type, IInvoker<IConnection, IPacket>>(), typeof(IPacketHandler<>))
 		{ }
 
 		protected override void Handle(Type packetType)
