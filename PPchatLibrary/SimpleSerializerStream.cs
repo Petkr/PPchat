@@ -11,10 +11,10 @@ namespace PPchatLibrary
 
 	public class SimpleSerializerStream : IDisposable,
 		IReaderWriter<int>,
-		IReaderWriter<Memory<byte>>,
-		IReaderWriter<byte[]>,
 		IReaderWriter<string>,
-		IReaderWriter<IPAddress>
+		IReaderWriter<IPAddress>,
+		IReader<Memory<char>>,
+		IWriter<ReadOnlyMemory<char>>
 	{
 		readonly Stream Stream;
 
@@ -45,67 +45,78 @@ namespace PPchatLibrary
 
 
 
-		void ReadBytes(Span<byte> bytes)
-		{
-			if (Stream.Read(bytes) != bytes.Length)
-				throw new SimpleSerializerEndOfStreamException();
-		}
-		void ReadBytes(byte[] bytes)
-			=> ReadBytes(bytes.AsSpan());
-		void ReadBytes(Memory<byte> bytes)
-			=> ReadBytes(bytes.Span);
-
-		void WriteBytes(ReadOnlySpan<byte> bytes)
-			=> Stream.Write(bytes);
-
-
-
-		public void Write(Memory<byte> bytes)
-			=> Write(bytes.Span);
-		Memory<byte> IReader<Memory<byte>>.Read()
-			=> Read<byte[]>().AsMemory();
-
-		public void Write(Span<byte> bytes)
-		{
-			Write(bytes.Length);
-			WriteBytes(bytes);
-		}
-		public Span<byte> ReadSpan()
-			=> Read<Memory<byte>>().Span;
-
-		public void Write(byte[] bytes)
-			=> Write(bytes.AsSpan());
-		byte[] IReader<byte[]>.Read()
-		{
-			var length = Read<int>();
-			var bytes = new byte[length];
-			ReadBytes(bytes);
-			return bytes;
-		}
-
-		public void Write(int t)
+		unsafe void WriteUnmanaged<T>(T t)
+			where T : unmanaged
 		{
 			Span<byte> span = stackalloc byte[sizeof(int)];
 			MemoryMarshal.Write(span, ref t);
 			Stream.Write(span);
 		}
-		int IReader<int>.Read()
+		unsafe T ReadUnmanaged<T>()
+			where T : unmanaged
 		{
-			Span<byte> span = stackalloc byte[sizeof(int)];
-			if (Stream.Read(span) != sizeof(int))
+			Span<byte> span = stackalloc byte[sizeof(T)];
+			if (Stream.Read(span) != sizeof(T))
 				throw new SimpleSerializerEndOfStreamException();
-			return MemoryMarshal.Read<int>(span);
+			return MemoryMarshal.Read<T>(span);
 		}
 
-		public void Write(string t)
-			=> Write(Encoding.ASCII.GetBytes(t));
-		string IReader<string>.Read()
-			=> Encoding.ASCII.GetString(Read<byte[]>());
 
+
+		unsafe void WriteUnmanagedMany<T>(ReadOnlySpan<T> span)
+			where T : unmanaged
+		{
+			WriteUnmanaged(span.Length);
+			WriteRaw(MemoryMarshal.AsBytes(span));
+		}
+		unsafe T[] ReadUnmanagedMany<T>()
+			where T : unmanaged
+		{
+			T[] array = new T[ReadUnmanaged<int>()];
+			ReadRaw(MemoryMarshal.AsBytes(array.AsSpan()));
+			return array;
+		}
+
+
+
+		void WriteRaw(ReadOnlySpan<byte> bytes)
+			=> Stream.Write(bytes);
+		void ReadRaw(Span<byte> bytes)
+		{
+			if (Stream.Read(bytes) != bytes.Length)
+				throw new SimpleSerializerEndOfStreamException();
+		}
+
+
+
+		public void Write(int t)
+			=> WriteUnmanaged(t);
+		int IReader<int>.Read()
+			=> ReadUnmanaged<int>();
+
+		public void Write(string t)
+			=> WriteUnmanagedMany(t.AsSpan());
+		string IReader<string>.Read()
+			=> Encoding.ASCII.GetString(MemoryMarshal.AsBytes(ReadUnmanagedMany<char>().AsSpan()));
 
 		IPAddress IReader<IPAddress>.Read()
-			=> new IPAddress(ReadSpan());
+			=> new IPAddress(ReadUnmanagedMany<byte>());
 		public void Write(IPAddress t)
-			=> Write(t.GetAddressBytes());
+		{
+			Span<byte> bytes = stackalloc byte[16];
+			if (t.TryWriteBytes(bytes, out var writtenLength))
+			{
+				bytes = bytes.Slice(0, writtenLength);
+				WriteUnmanagedMany<byte>(bytes);
+			}
+			else
+				throw new Exception();
+		}
+
+		Memory<char> IReader<Memory<char>>.Read()
+			=> ReadUnmanagedMany<char>().AsMemory();
+
+		public void Write(ReadOnlyMemory<char> t)
+			=> WriteUnmanagedMany(t.Span);
 	}
 }
