@@ -77,7 +77,7 @@ constexpr inline auto is_nonspace_or_in_quotes =
 
 
 
-std::pair<Span<Char>, Span<Char>> split_one_token(Span<Char> input)
+std::pair<Span<Char>, Span<Char>> split_one_token(Span<Char> input) noexcept
 {
 	auto begin = input.begin;
 
@@ -90,10 +90,10 @@ std::pair<Span<Char>, Span<Char>> split_one_token(Span<Char> input)
 	return { remove(token, is_char<'"'>), skip_while(input, is_char<' '>) };
 }
 
+static std::vector<Span<Char>> ranges;
+
 Span<Span<Char>> get_tokens(Span<Char> input)
 {
-	static std::vector<Span<Char>> ranges;
-
 	ranges.clear();
 
 	input = skip_while(input, is_char<' '>);
@@ -108,7 +108,16 @@ Span<Span<Char>> get_tokens(Span<Char> input)
 	return { ranges.data(), ranges.data() + ranges.size() };
 }
 
-extern "C" __declspec(dllexport) RangeSpan GetTokensRangeImplementation(CharSpan input)
+
+
+#define EXPORT extern "C" __declspec(dllexport)
+
+EXPORT RangeSpan GetTokensRangeImplementation(CharSpan input)
 {
 	return { get_tokens(input.x) };
+}
+
+EXPORT void ReleaseResources() noexcept
+{
+	ranges.clear();
 }
