@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PPchatLibrary
 {
-	readonly struct EnumerableInvoker<Caller, Parameter> : IInvoker<Caller, Parameter>
+	class EnumerableInvoker<Caller, Parameter> : IInvoker<Caller, Parameter>
 	{
 		readonly IEnumerable<IInvoker<Caller, Parameter>> Invokers;
 
