@@ -10,22 +10,22 @@ namespace PPchatServer
 {
 	public class Server : Application<Server>,
 		ICommandHandler<StartCommandArgument>,
+		ICommandHandler<StartPortCommandArgument>,
 		ICommandHandler<StopCommandArgument>
 	{
-		readonly TcpListener tcpListener;
+		TcpListener? tcpListener;
 
 		readonly ISet<IConnection> connections;
 		protected override IEnumerable<IConnection> Connections => connections;
 
 		Thread? acceptConnectionsThread;
 
-		bool Running => acceptConnectionsThread != null;
+		bool Running => tcpListener != null;
 
 		protected override string ExitMessage => "server shut down";
 
 		public Server()
 		{
-			tcpListener = new TcpListener(IPAddress.Any, 2048);
 			connections = new HashSet<IConnection>();
 		}
 
@@ -36,7 +36,7 @@ namespace PPchatServer
 			{
 				try
 				{
-					tcpClient = tcpListener.AcceptTcpClient();
+					tcpClient = tcpListener!.AcceptTcpClient();
 				}
 				catch (SocketException e)
 				{
@@ -52,7 +52,8 @@ namespace PPchatServer
 
 		void StopListening()
 		{
-			tcpListener.Stop();
+			tcpListener?.Stop();
+			tcpListener = null;
 			acceptConnectionsThread?.Join();
 			acceptConnectionsThread = null;
 		}
@@ -82,10 +83,11 @@ namespace PPchatServer
 			Write($"client disconnected, reason: {reason}");
 		}
 
-		public void Handle(StartCommandArgument _)
+		void StartListening(int port)
 		{
 			if (!Running)
 			{
+				tcpListener = new TcpListener(IPAddress.Any, port);
 				tcpListener.Start();
 				acceptConnectionsThread = new Thread(AcceptConnections);
 				acceptConnectionsThread.Start();
@@ -94,6 +96,12 @@ namespace PPchatServer
 			else
 				Write("already running");
 		}
+
+		public void Handle(StartPortCommandArgument argument)
+			=> StartListening(argument.Port);
+
+		public void Handle(StartCommandArgument _)
+			=> StartListening(2048);
 
 		public void Handle(StopCommandArgument _)
 		{
