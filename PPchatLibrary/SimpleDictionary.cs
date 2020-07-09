@@ -2,22 +2,29 @@
 
 namespace PPchatLibrary
 {
-	class SimpleDictionary<Dictionary, Key, Value> : ISimpleDictionary<Key, Value>
-		where Value : class
-		where Dictionary : IDictionary<Key, Value>, new()
+	class SimpleDictionary<Key, Value> : ISimpleDictionary<Key, Value>
+	where Value : class
 	{
-		readonly IDictionary<Key, Value> dictionary;
+		readonly IDictionary<Key, Value> Dictionary;
 
-		public SimpleDictionary()
-			=> dictionary = new Dictionary();
-
+		public SimpleDictionary(IDictionary<Key, Value> dictionary)
+			=> Dictionary = dictionary;
 		public void Add(Key key, Value value)
-			=> dictionary.Add(key, value);
+			=> Dictionary.Add(key, value);
 
 		public Value? GetValue(Key key)
 		{
-			dictionary.TryGetValue(key, out var value);
+			Dictionary.TryGetValue(key, out var value);
 			return value;
 		}
+	}
+
+	class SimpleDictionary<Dictionary, Key, Value> : SimpleDictionary<Key, Value>
+		where Value : class
+		where Dictionary : IDictionary<Key, Value>, new()
+	{
+		public SimpleDictionary()
+			: base(new Dictionary())
+		{ }
 	}
 }
