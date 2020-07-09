@@ -3,6 +3,6 @@
 	interface ISimpleReadonlyDictionary<Key, out Value>
 		where Value : class
 	{
-		Value? GetValue(Key from);
+		Value? GetValue(Key key);
 	}
 }
