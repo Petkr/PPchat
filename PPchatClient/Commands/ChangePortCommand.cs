@@ -1,4 +1,5 @@
 ﻿using PPchatLibrary;
+using System;
 
 namespace PPchatClient
 {
@@ -7,7 +8,7 @@ namespace PPchatClient
 	{
 		public readonly int port;
 
-		public ChangePortCommandArgument(string s)
+		public ChangePortCommandArgument(ReadOnlyMemory<char> s)
 		{
 			port = Parsers.ParsePort(s);
 		}

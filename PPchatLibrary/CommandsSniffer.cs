@@ -4,14 +4,14 @@ using System.Reflection;
 
 namespace PPchatLibrary
 {
-	class CommandsSniffer<Application> : BasicSniffer<string, ICommandArgumentCountDictionary, Application>, ICommandsSniffer
+	class CommandsSniffer<Application> : BasicSniffer<ReadOnlyMemory<char>, ICommandArgumentCountDictionary, Application>, ICommandsSniffer
 		where Application : IApplication
 	{
 		public ICommandDescriptor NotFoundCommand { get; }
 		public ICommandDescriptor BadArgumentCountCommand { get; }
 
 		public CommandsSniffer()
-			: base(typeof(ICommandHandler<>))
+			: base(new SortedDictionary<ReadOnlyMemory<char>, ICommandArgumentCountDictionary>(new MemoryStringComparer()), typeof(ICommandHandler<>))
 		{
 			NotFoundCommand = new CommandDescriptor<Application, NotFoundCommandArgument>();
 			BadArgumentCountCommand = new CommandDescriptor<Application, BadArgumentCountCommandArgument>();
@@ -34,18 +34,18 @@ namespace PPchatLibrary
 					commands = new UniqueNameAndOneLongArgumentCommandArgumentCountDictionary(command);
 				else
 					commands = new UniqueNameCommandArgumentCountDictionary(command);
-				Add(attribute.Name, commands);
+				Add(attribute.Name.AsMemory(), commands);
 			}
 			else
 			{
-				var commands = GetValue(attribute.Name);
+				var commands = GetValue(attribute.Name.AsMemory());
 				if (commands == null)
 				{
 					if (attribute.HasOneLongArgument)
 						commands = new OneLongArgumentCommandArgumentCountDictionary();
 					else
 						commands = new BasicCommandArgumentCountDictionary();
-					Add(attribute.Name, commands);
+					Add(attribute.Name.AsMemory(), commands);
 				}
 
 				if (attribute.HasOneLongArgument)
@@ -69,7 +69,7 @@ namespace PPchatLibrary
 			}
 		}
 
-		ICommandArgumentCountReadonlyDictionary? ISimpleReadonlyDictionary<string, ICommandArgumentCountReadonlyDictionary>.GetValue(string from)
+		ICommandArgumentCountReadonlyDictionary? ISimpleReadonlyDictionary<ReadOnlyMemory<char>, ICommandArgumentCountReadonlyDictionary>.GetValue(ReadOnlyMemory<char> from)
 			=> GetValue(from);
 	}
 }

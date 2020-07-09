@@ -1,13 +1,14 @@
 ﻿using PPchatLibrary;
+using System;
 
 namespace PPchatClient
 {
 	[Command("connect", 2)]
 	public readonly struct SimpleConnectSavedServerCommandArgument : ICommandArgument
 	{
-		public readonly string ServerName;
+		public readonly ReadOnlyMemory<char> ServerName;
 
-		public SimpleConnectSavedServerCommandArgument(string serverName)
+		public SimpleConnectSavedServerCommandArgument(ReadOnlyMemory<char> serverName)
 		{
 			ServerName = serverName;
 		}

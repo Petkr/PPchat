@@ -1,13 +1,14 @@
 ﻿using PPchatLibrary;
+using System;
 
 namespace PPchatClient
 {
 	[Command("say", CommandFlags.OneLongArgument | CommandFlags.UniqueName)]
 	public readonly struct SayCommandArgument : ICommandArgument
 	{
-		public readonly string Message;
+		public readonly ReadOnlyMemory<char> Message;
 
-		public SayCommandArgument(string input)
+		public SayCommandArgument(ReadOnlyMemory<char> input)
 		{
 			Message = input;
 		}

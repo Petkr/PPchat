@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
+using System;
 
 namespace PPchatServer
 {
@@ -106,26 +107,26 @@ namespace PPchatServer
 				Write("not running");
 		}
 
-		static (string, bool did_cut) CutString(string s, int maxLength)
+		static (ReadOnlyMemory<char>, bool did_cut) CutString(ReadOnlyMemory<char> s, int maxLength)
 		{
 			if (s.Length > maxLength)
-				return (s.Substring(0, maxLength), true);
+				return (s.Slice(0, maxLength), true);
 			else
 				return (s, false);
 		}
 
-		static string CutStringFancy(string s, int maxLength, string to_append_if_cut)
+		static ReadOnlyMemory<char> CutStringFancy(ReadOnlyMemory<char> s, int maxLength, ReadOnlyMemory<char> to_append_if_cut)
 		{
 			var (s_out, did_cut) = CutString(s, maxLength);
 			if (did_cut)
-				return s_out + to_append_if_cut;
+				return string.Concat(s.Span, to_append_if_cut.Span).AsMemory();
 			else
 				return s_out;
 		}
-
+		
 		public override void Handle(NotFoundCommandArgument argument)
 		{
-			Write($"invalid command: {CutStringFancy(argument.Input, 20, "...")}");
+			Write($"invalid command: {CutStringFancy(argument.Input, 20, "...".AsMemory())}");
 		}
 	}
 }

@@ -1,10 +1,12 @@
-﻿namespace PPchatLibrary
+﻿using System;
+
+namespace PPchatLibrary
 {
 	public readonly struct NotFoundCommandArgument : ICommandArgument
 	{
-		public readonly string Input;
+		public readonly ReadOnlyMemory<char> Input;
 
-		public NotFoundCommandArgument(string input)
+		public NotFoundCommandArgument(ReadOnlyMemory<char> input)
 		{
 			Input = input;
 		}

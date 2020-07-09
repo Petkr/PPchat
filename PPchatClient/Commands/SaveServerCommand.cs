@@ -9,9 +9,9 @@ namespace PPchatClient
 	{
 		public readonly IPAddress Address;
 		public readonly int Port;
-		public readonly string ServerName;
+		public readonly ReadOnlyMemory<char> ServerName;
 
-		public SaveServerCommandArgument(string addressString, string portString, string serverName)
+		public SaveServerCommandArgument(ReadOnlyMemory<char> addressString, ReadOnlyMemory<char> portString, ReadOnlyMemory<char> serverName)
 		{
 			Address = Parsers.ParseIPAddress(addressString);
 			Port = Parsers.ParsePort(portString);

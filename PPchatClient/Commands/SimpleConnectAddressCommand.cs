@@ -1,5 +1,6 @@
 ﻿using PPchatLibrary;
 using System.Net;
+using System;
 
 namespace PPchatClient
 {
@@ -8,7 +9,7 @@ namespace PPchatClient
 	{
 		public readonly IPAddress Address;
 
-		public SimpleConnectAddressCommandArgument(string addressString)
+		public SimpleConnectAddressCommandArgument(ReadOnlyMemory<char> addressString)
 		{
 			Address = Parsers.ParseIPAddress(addressString);
 		}

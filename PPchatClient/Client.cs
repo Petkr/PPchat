@@ -4,6 +4,7 @@ using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using PPchatLibrary;
+using System.Runtime.InteropServices;
 
 namespace PPchatClient
 {
@@ -32,7 +33,7 @@ namespace PPchatClient
 
 		const string savedServersPath = "saved_servers";
 
-		readonly IDictionary<string, (IPAddress, int)> savedServers;
+		readonly IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> savedServers;
 
 		void SerializeSavedServers()
 		{
@@ -48,23 +49,31 @@ namespace PPchatClient
 			}
 		}
 
-		static IEnumerable<(string key, (IPAddress, int) value)> DeserializeSavedServersImplementation(SimpleSerializerStream serializer)
+		static IEnumerable<(ReadOnlyMemory<char> key, (IPAddress, int) value)> DeserializeSavedServersImplementation(SimpleSerializerStream serializer)
 		{
-			var count = serializer.Read<int>();
+			int count;
+			try
+			{
+				count = serializer.Read<int>();
+			}
+			catch (SimpleSerializerEndOfStreamException)
+			{
+				yield break;
+			}
 
-			(string key, (IPAddress, int) value) pair;
+			(ReadOnlyMemory<char> key, (IPAddress, int) value) pair;
 
 			for (int i = 0; i != count; ++i)
 			{
-				pair.key = serializer.Read<string>();
+				pair.key = serializer.Read<Memory<char>>();
 				pair.value = serializer.ReadPair<IPAddress, int>();
 				yield return pair;
 			}
 		}
 
-		static IDictionary<string, (IPAddress, int)> DeserializeSavedServers()
+		static IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> DeserializeSavedServers()
 		{
-			IDictionary<string, (IPAddress, int)> saved_servers = new Dictionary<string, (IPAddress, int)>();
+			IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> saved_servers = new SortedDictionary<ReadOnlyMemory<char>, (IPAddress, int)>();
 			
 			if (File.Exists(savedServersPath))
 			{
@@ -165,11 +174,11 @@ namespace PPchatClient
 			Connect(IPAddress.Loopback, defaultPort);
 		}
 
-		void SendMessage(string message)
+		void SendMessage(ReadOnlyMemory<char> message)
 		{
 			if (Connected)
 			{
-				connection!.Stream.Write(new MessageForServerPacket(message));
+				connection!.Stream.Write(new MessageForServerPacket(new string(message.Span)));
 			}
 			else
 			{

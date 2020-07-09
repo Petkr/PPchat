@@ -1,6 +1,8 @@
-﻿namespace PPchatLibrary
+﻿using System;
+
+namespace PPchatLibrary
 {
-	interface ICommandsSniffer : ISimpleReadonlyDictionary<string, ICommandArgumentCountReadonlyDictionary>
+	interface ICommandsSniffer : ISimpleReadonlyDictionary<ReadOnlyMemory<char>, ICommandArgumentCountReadonlyDictionary>
 	{
 		ICommandDescriptor NotFoundCommand { get; }
 		ICommandDescriptor BadArgumentCountCommand { get; }
