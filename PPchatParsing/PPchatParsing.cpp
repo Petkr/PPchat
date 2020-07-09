@@ -1,6 +1,11 @@
 #include <vector>
 
 static_assert(sizeof(int) == 4);
+static_assert(sizeof(short) == 2);
+
+
+
+using Char = short;
 
 
 
@@ -11,26 +16,31 @@ struct Span
 	T* begin;
 	T* end;
 
-	constexpr operator bool()
+	constexpr operator bool() noexcept
 	{
 		return begin != end;
 	}
 };
 
-struct RangeSpan { Span<Span<char>> x; };
-struct CharSpan { Span<char> x; };
+struct RangeSpan { Span<Span<Char>> x; };
+struct CharSpan { Span<Char> x; };
 #pragma pack(pop)
 
 
 
+template <typename Range>
+constexpr std::add_rvalue_reference_t<decltype(*std::declval<Range>().begin)> declval_range() noexcept;
+
+
+
 template <typename Range, typename Predicate>
-constexpr Range skip_while(Range input, Predicate predicate)
+constexpr Range skip_while(Range input, Predicate predicate) noexcept(noexcept(predicate(declval_range<Range>())))
 {
 	return { std::find_if(input.begin, input.end, negate(predicate)), input.end };
 }
 
 template <typename Range, typename Predicate>
-constexpr Range remove(Range input, Predicate predicate)
+constexpr Range remove(Range input, Predicate predicate) noexcept(noexcept(predicate(declval_range<Range>())))
 {
 	return { input.begin, std::remove_if(input.begin, input.end, predicate) };
 }
@@ -38,7 +48,7 @@ constexpr Range remove(Range input, Predicate predicate)
 
 
 template <typename F>
-constexpr auto negate(F&& f)
+constexpr auto negate(F&& f) noexcept
 {
 	return[&f]<typename... T>(T &&... args)
 	{
@@ -48,13 +58,13 @@ constexpr auto negate(F&& f)
 
 
 
-template <char c>
-constexpr inline auto is_char = [](auto x) { return x == c; };
+template <Char c>
+constexpr inline auto is_char = [](auto x) noexcept { return x == c; };
 
 static bool in_quotes;
 
 constexpr inline auto is_nonspace_or_in_quotes =
-[](auto c)
+[](auto c) noexcept
 {
 	if (c == '"')
 	{
@@ -67,7 +77,7 @@ constexpr inline auto is_nonspace_or_in_quotes =
 
 
 
-std::pair<Span<char>, Span<char>> split_one_token(Span<char> input)
+std::pair<Span<Char>, Span<Char>> split_one_token(Span<Char> input)
 {
 	auto begin = input.begin;
 
@@ -75,14 +85,14 @@ std::pair<Span<char>, Span<char>> split_one_token(Span<char> input)
 
 	input = skip_while(input, is_nonspace_or_in_quotes);
 
-	Span<char> token{ begin, input.begin };
+	Span<Char> token{ begin, input.begin };
 
 	return { remove(token, is_char<'"'>), skip_while(input, is_char<' '>) };
 }
 
-Span<Span<char>> get_tokens(Span<char> input)
+Span<Span<Char>> get_tokens(Span<Char> input)
 {
-	static std::vector<Span<char>> ranges;
+	static std::vector<Span<Char>> ranges;
 
 	ranges.clear();
 
