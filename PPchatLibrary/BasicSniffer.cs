@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PPchatLibrary
 {
-	abstract class BasicSniffer<Key, Value, TypeToScan> : SimpleDictionary<Dictionary<Key, Value>, Key, Value>
+	abstract class BasicSniffer<Key, Value, TypeToScan> : SimpleDictionary<Key, Value>
 		where Value : class
 		where Key : notnull
 	{
@@ -13,7 +13,8 @@ namespace PPchatLibrary
 			.Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterfaceDefinitionType)
 			.Select(x => x.GetGenericArguments()[0]);
 
-		public BasicSniffer(Type genericInterfaceDefinitionType)
+		public BasicSniffer(IDictionary<Key, Value> map, Type genericInterfaceDefinitionType)
+			: base(map)
 		{
 			foreach (var t in GetImplementedInterfaces<TypeToScan>(genericInterfaceDefinitionType))
 				Handle(t);
