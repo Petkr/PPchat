@@ -6,12 +6,13 @@ using System.Threading;
 
 namespace PPchatLibrary
 {
-	public abstract class Connection<ApplicationConnection> : IConnection,
+	public abstract class Connection<SpecificApplication, ApplicationConnection> : IConnection,
 		IPacketHandler<EndPacket>
 
+		where SpecificApplication : IApplication
 		where ApplicationConnection : IConnection
 	{
-		public IApplication Application { get; }
+		public SpecificApplication Application { get; }
 		readonly TcpClient tcpClient;
 		public IReaderWriter<IPacket> Stream { get; }
 		readonly Thread thread;
@@ -25,7 +26,7 @@ namespace PPchatLibrary
 			client.Connect(ipAddress, port);
 			return client;
 		}
-		public Connection(IApplication application, TcpClient tcpClient)
+		public Connection(SpecificApplication application, TcpClient tcpClient)
 		{
 			if (!tcpClient.Connected)
 				throw new Exception("The client provided to the constructor should be connected already. Use the other overload to connect to a particular address and port");
@@ -36,7 +37,7 @@ namespace PPchatLibrary
 			thread = new Thread(Handle);
 			thread.Start();
 		}
-		public Connection(IApplication application, IPAddress ipAddress, int port)
+		public Connection(SpecificApplication application, IPAddress ipAddress, int port)
 			: this(application, CreateClientAndConnect(ipAddress, port))
 		{}
 
