@@ -73,7 +73,8 @@ namespace PPchatClient
 
 		static IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> DeserializeSavedServers()
 		{
-			IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> saved_servers = new SortedDictionary<ReadOnlyMemory<char>, (IPAddress, int)>();
+			IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> saved_servers =
+				new SortedDictionary<ReadOnlyMemory<char>, (IPAddress, int)>(new MemoryStringComparer());
 			
 			if (File.Exists(savedServersPath))
 			{
