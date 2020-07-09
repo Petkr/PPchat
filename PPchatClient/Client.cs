@@ -4,7 +4,6 @@ using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using PPchatLibrary;
-using System.Runtime.InteropServices;
 
 namespace PPchatClient
 {
