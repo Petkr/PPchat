@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
@@ -20,16 +19,10 @@ namespace PPchatLibrary
 
 		static readonly IInvoker<IConnection, IPacket> Parser = new PacketParser<ApplicationConnection>();
 
-		static TcpClient CreateClientAndConnect(IPAddress ipAddress, int port)
-		{
-			var client = new TcpClient();
-			client.Connect(ipAddress, port);
-			return client;
-		}
-		public Connection(SpecificApplication application, TcpClient tcpClient)
+		protected Connection(SpecificApplication application, TcpClient tcpClient)
 		{
 			if (!tcpClient.Connected)
-				throw new Exception("The client provided to the constructor should be connected already. Use the other overload to connect to a particular address and port");
+				throw new Exception("The client provided to the constructor should be connected already.");
 
 			Application = application;
 			this.tcpClient = tcpClient;
@@ -37,9 +30,6 @@ namespace PPchatLibrary
 			thread = new Thread(Handle);
 			thread.Start();
 		}
-		public Connection(SpecificApplication application, IPAddress ipAddress, int port)
-			: this(application, CreateClientAndConnect(ipAddress, port))
-		{}
 
 		public void Close()
 		{
