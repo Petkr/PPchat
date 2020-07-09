@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.CompilerServices;
 
 namespace PPchatLibrary
 {
@@ -73,6 +72,9 @@ namespace PPchatLibrary
 
 			return arr;
 		}
+
+		[DllImport("PPchatParsing.dll")]
+		public static extern void ReleaseResources();
 	}
 
 	class CommandParser<Application> : IParser<IApplication, string, object[]>
@@ -118,6 +120,7 @@ namespace PPchatLibrary
 		public (IInvoker<IApplication, object[]>, object[]) Parse(string input)
 		{
 			var (commands, arguments) = ParseImplementation(input);
+			NativeParsing.ReleaseResources();
 			return (new EnumerableInvoker<IApplication, object[]>(commands), arguments);
 		}
 	}
