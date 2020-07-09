@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace PPchatLibrary
 {
@@ -31,39 +32,46 @@ namespace PPchatLibrary
 		}
 
 		[DllImport("PPchatParsing.dll")]
-		static extern MySpan<MySpan<byte>> GetTokensRangeImplementation(MySpan<byte> input);
+		static extern MySpan<MySpan<char>> GetTokensRangeImplementation(MySpan<char> input);
 
-		public static unsafe Span<MySpan<byte>> GetTokensRange(string input)
+		public static unsafe Span<MySpan<char>> GetTokensRange(string input)
 		{
-			var bytes = Encoding.ASCII.GetBytes(input);
-			MySpan<MySpan<byte>> s;
-			fixed (byte* ptr = bytes)
+			MySpan<MySpan<char>> s;
+			fixed (char* ptr = input)
 			{
-				s = GetTokensRangeImplementation(new MySpan<byte>(ptr, ptr + input.Length));
+				s = GetTokensRangeImplementation(new MySpan<char>(ptr, ptr + input.Length));
 			}
 			return s;
-		}
-
-		public static string MakeString(MySpan<byte> token)
-			=> Encoding.ASCII.GetString(token);
-
-		public static string MakeTailString(string s, Span<byte> token)
-			=> s.Substring(token.Length);
-
-		public static string[] MakeStrings(Span<MySpan<byte>> tokens)
-		{
-			var arr = new string[tokens.Length];
-
-			for (int i = 0; i != arr.Length; ++i)
-				arr[i] = MakeString(tokens[i]);
-
-			return arr;
 		}
 
 		public static void SetEncoding()
 		{
 			Console.InputEncoding = Encoding.ASCII;
 			Console.OutputEncoding = Console.InputEncoding;
+		}
+
+		public unsafe static long GetOffsetFromStart(string s, ReadOnlySpan<char> span)
+		{
+			fixed (char* string_ptr = s, span_ptr = span)
+			{
+				return span_ptr - string_ptr;
+			}
+		}
+
+		public static ReadOnlyMemory<char> GetMemory(string s, ReadOnlySpan<char> token)
+			=> s.AsMemory().Slice((int)GetOffsetFromStart(s, token), token.Length);
+
+		public static ReadOnlyMemory<char> GetTailMemory(string s, ReadOnlySpan<char> token)
+			=> s.AsMemory().Slice(token.Length);
+
+		public static object[] MakeMemories(string s, Span<MySpan<char>> tokens)
+		{
+			var arr = new object[tokens.Length];
+
+			for (int i = 0; i != arr.Length; ++i)
+				arr[i] = GetMemory(s, tokens[i]);
+
+			return arr;
 		}
 	}
 
@@ -86,25 +94,25 @@ namespace PPchatLibrary
 		{
 			var tokens = NativeParsing.GetTokensRange(s);
 
-			var commands = commandsSniffer.GetValue(NativeParsing.MakeString(tokens[0]));
+			var commands = commandsSniffer.GetValue(NativeParsing.GetMemory(s, tokens[0]));
 
 			if (commands != null)
 			{
 				{
 					var command = commands.GetIfOneLongArgument;
 					if (command != null)
-						return JustOneArgument(command, NativeParsing.MakeTailString(s, tokens[0]));
+						return JustOneArgument(command, NativeParsing.GetTailMemory(s, tokens[0]).TrimStart());
 				}
 				tokens = tokens.Slice(1);
 
 				var commandsWithRightArgumentCount = commands.GetValue(tokens.Length);
 				if (commandsWithRightArgumentCount != null)
-					return (commandsWithRightArgumentCount, NativeParsing.MakeStrings(tokens));
+					return (commandsWithRightArgumentCount, NativeParsing.MakeMemories(s, tokens));
 				else
 					return JustOneArgument(commandsSniffer.BadArgumentCountCommand, tokens.Length);
 			}
 			else
-				return JustOneArgument(commandsSniffer.NotFoundCommand, s.TrimStart());
+				return JustOneArgument(commandsSniffer.NotFoundCommand, s.AsMemory().TrimStart());
 		}
 
 		public (IInvoker<IApplication, object[]>, object[]) Parse(string input)
