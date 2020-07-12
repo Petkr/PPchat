@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Linq;
 using System.Collections.Generic;
-using PPchatLibrary;
+using PPnetwork;
 using PPchatPackets;
 
 namespace PPchatClient

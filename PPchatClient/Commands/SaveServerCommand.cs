@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using PPchatLibrary;
+using PPnetwork;
 
 namespace PPchatClient
 {

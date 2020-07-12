@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PPchatLibrary\PPchatLibrary.csproj" />
     <ProjectReference Include="..\PPchatPackets\PPchatPackets.csproj" />
+    <ProjectReference Include="..\PPnetwork\PPnetwork\PPnetwork.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using PPchatLibrary;
+﻿using PPnetwork;
 
 namespace PPchatClient
 {
