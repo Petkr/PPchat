@@ -1,6 +1,7 @@
 ﻿using System;
+using PPchatLibrary;
 
-namespace PPchatLibrary
+namespace PPchatPackets
 {
 	[Serializable]
 	public readonly struct MessageForClientPacket : IPacket

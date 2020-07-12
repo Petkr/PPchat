@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PPchatLibrary\PPchatLibrary.csproj" />
+    <ProjectReference Include="..\PPchatPackets\PPchatPackets.csproj" />
   </ItemGroup>
 
 </Project>

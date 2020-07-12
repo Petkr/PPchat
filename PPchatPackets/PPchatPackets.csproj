@@ -1,14 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Nullable>enable</Nullable>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PPchatLibrary\PPchatLibrary.csproj" />
-    <ProjectReference Include="..\PPchatPackets\PPchatPackets.csproj" />
   </ItemGroup>
 
 </Project>
