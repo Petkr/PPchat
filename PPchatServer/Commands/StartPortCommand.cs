@@ -3,7 +3,7 @@ using System;
 
 namespace PPchatServer
 {
-	[Command("start")]
+	[Command("start", CommandFlags.UniqueArgumentCount)]
 	public readonly struct StartPortCommandArgument : ICommandArgument
 	{
 		public readonly int Port;

@@ -2,7 +2,7 @@
 
 namespace PPchatServer
 {
-	[Command("start")]
+	[Command("start", CommandFlags.UniqueArgumentCount)]
 	public readonly struct StartCommandArgument : ICommandArgument
 	{ }
 }

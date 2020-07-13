@@ -111,16 +111,6 @@ namespace PPchatClient
 			connection = null;
 		}
 
-		public override void HandleAbruptConnectionClose(IConnection _)
-		{
-			Write("server abruptly terminated the connection");
-		}
-
-		public override void HandleNormalConnectionClose(IConnection _, string reason)
-		{
-			Write($"server terminated the connection, reason: {reason}");
-		}
-
 		public void Handle(ChangePortCommandArgument argument)
 		{
 			Write($"the default port was changed from: {defaultPort}, to: {argument.port}");

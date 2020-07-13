@@ -2,7 +2,7 @@
 
 namespace PPchatServer
 {
-	[Command("stop")]
+	[Command("stop", CommandFlags.UniqueName)]
 	public readonly struct StopCommandArgument : ICommandArgument
 	{ }
 }

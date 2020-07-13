@@ -23,5 +23,15 @@ namespace PPchatClient
 		{
 			Application.Write(packet.Message);
 		}
+
+		public override void HandleAbruptConnectionClose()
+		{
+			Application.Write("server abruptly terminated the connection");
+		}
+
+		public override void HandleNormalConnectionClose(string reason)
+		{
+			Application.Write($"server terminated the connection, reason: {reason}");
+		}
 	}
 }

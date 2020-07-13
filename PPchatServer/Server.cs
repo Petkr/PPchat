@@ -73,16 +73,6 @@ namespace PPchatServer
 			connections.Clear();
 		}
 
-		public override void HandleAbruptConnectionClose(IConnection connection)
-		{
-			Write("connection with a client was abruptly terminated");
-		}
-
-		public override void HandleNormalConnectionClose(IConnection connection, string reason)
-		{
-			Write($"client disconnected, reason: {reason}");
-		}
-
 		void StartListening(int port)
 		{
 			if (!Running)

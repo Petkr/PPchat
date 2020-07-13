@@ -29,5 +29,15 @@ namespace PPchatServer
 			Stream.Write(new MessageForClientPacket($"hi, {username}!"));
 			Application.Write($"user {username} logged in");
 		}
+
+		public override void HandleAbruptConnectionClose()
+		{
+			Application.Write("connection with a client was abruptly terminated");
+		}
+
+		public override void HandleNormalConnectionClose(string reason)
+		{
+			Application.Write($"client disconnected, reason: {reason}");
+		}
 	}
 }
