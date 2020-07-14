@@ -29,23 +29,19 @@ namespace PPchatClient
 
 		protected override string ExitMessage => "disconnecting because the client is shutting down";
 
-		int defaultPort = 2048;
+		int defaultPort;
 
-		const string savedServersPath = "saved_servers";
+		const string dataPath = "data";
 
 		readonly IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> savedServers;
 
-		void SerializeSavedServers()
+		void SerializeSavedServers(SimpleSerializerStream stream)
 		{
-			File.Delete(savedServersPath);
-
-			using var serializer = new SimpleSerializerStream(new FileStream(savedServersPath, FileMode.CreateNew));
-
-			serializer.Write(savedServers.Count);
+			stream.Write(savedServers.Count);
 			foreach (var (key, value) in savedServers)
 			{
-				serializer.Write(key);
-				serializer.Write(value);
+				stream.Write(key);
+				stream.Write(value);
 			}
 		}
 
@@ -71,25 +67,37 @@ namespace PPchatClient
 			}
 		}
 
-		static IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> DeserializeSavedServers()
+		static IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> DeserializeSavedServers(SimpleSerializerStream stream)
 		{
 			IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> saved_servers =
 				new SortedDictionary<ReadOnlyMemory<char>, (IPAddress, int)>(new MemoryStringComparer());
-			
-			if (File.Exists(savedServersPath))
-			{
-				using var serializer = new SimpleSerializerStream(new FileStream(savedServersPath, FileMode.Open));
 
-				foreach (var (key, value) in DeserializeSavedServersImplementation(serializer))
-					saved_servers.Add(key, value);
-			}
+			foreach (var (key, value) in DeserializeSavedServersImplementation(stream))
+				saved_servers.Add(key, value);
 
 			return saved_servers;
 		}
 
 		public Client()
 		{
-			savedServers = DeserializeSavedServers();
+			using var stream = new SimpleSerializerStream(new FileStream(dataPath, FileMode.OpenOrCreate));
+			try
+			{
+				defaultPort = stream.Read<int>();
+			}
+			catch (SimpleSerializerEndOfStreamException)
+			{
+				defaultPort = 2048;
+			}
+			savedServers = DeserializeSavedServers(stream);
+		}
+
+		public void Dispose()
+		{
+			File.Delete(dataPath);
+			using var stream = new SimpleSerializerStream(new FileStream(dataPath, FileMode.CreateNew));
+			stream.Write(defaultPort);
+			SerializeSavedServers(stream);
 		}
 
 		public override void RemoveConnection(IConnection _)
@@ -209,11 +217,6 @@ namespace PPchatClient
 			{
 				Write("you don't have any saved servers");
 			}
-		}
-
-		public void Dispose()
-		{
-			SerializeSavedServers();
 		}
 	}
 }
