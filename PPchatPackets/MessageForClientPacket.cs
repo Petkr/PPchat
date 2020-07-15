@@ -3,6 +3,9 @@ using PPnetwork;
 
 namespace PPchatPackets
 {
+	/// <summary>
+	/// Message Packet sent by the Server to the Client.
+	/// </summary>
 	[Serializable]
 	public readonly struct MessageForClientPacket : IPacket
 	{

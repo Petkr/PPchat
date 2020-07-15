@@ -84,6 +84,11 @@ Prints all [saved servers](#Saved-Servers).
 
 Sends `message` to the server, which sends it to other connected clients.
 
+### Connecting
+
+After connecting, the Client will request a username.
+This string is used by the server to refer to the Client during this session.
+
 ### Default Port
 
 The user can set a default port, which is used as default in some commands.

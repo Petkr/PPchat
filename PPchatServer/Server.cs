@@ -8,19 +8,22 @@ using System;
 
 namespace PPchatServer
 {
-	public class Server : Application<Server>,
+	class Server : Application<Server>,
 		ICommandHandler<StartCommandArgument>,
 		ICommandHandler<StartPortCommandArgument>,
 		ICommandHandler<StopCommandArgument>
 	{
 		TcpListener? tcpListener;
+		bool Running => tcpListener != null;
+
+		/// <summary>
+		/// Thread on which new Connections are accepted
+		/// </summary>
+		Thread? acceptConnectionsThread;
+
 
 		readonly ISet<IConnection> connections;
 		protected override IEnumerable<IConnection> Connections => connections;
-
-		Thread? acceptConnectionsThread;
-
-		bool Running => tcpListener != null;
 
 		protected override string ExitMessage => "server shut down";
 
@@ -29,6 +32,9 @@ namespace PPchatServer
 			connections = new HashSet<IConnection>();
 		}
 
+		/// <summary>
+		/// Loop that listens to new connecting Connections.
+		/// </summary>
 		void AcceptConnections()
 		{
 			TcpClient tcpClient;
@@ -50,29 +56,9 @@ namespace PPchatServer
 			}
 		}
 
-		void StopListening()
-		{
-			tcpListener?.Stop();
-			tcpListener = null;
-			acceptConnectionsThread?.Join();
-			acceptConnectionsThread = null;
-		}
-
-		public IEnumerable<IConnection> OtherConnectionsThan(IConnection connection) =>
-			Connections.Where(x => x != connection);
-
-		protected override void HandleAfterExit() => StopListening();
-
-		public override void RemoveConnection(IConnection connection)
-		{
-			connections.Remove(connection);
-		}
-
-		protected override void ClearConnections()
-		{
-			connections.Clear();
-		}
-
+		/// <summary>
+		/// Start accepting new Connections on <paramref name="port"/>.
+		/// </summary>
 		void StartListening(int port)
 		{
 			if (!Running)
@@ -85,6 +71,39 @@ namespace PPchatServer
 			}
 			else
 				Write("already running");
+		}
+
+		/// <summary>
+		/// Stops the accepting of new Connections.
+		/// </summary>
+		void StopListening()
+		{
+			tcpListener?.Stop();
+			tcpListener = null;
+			acceptConnectionsThread?.Join();
+			acceptConnectionsThread = null;
+		}
+
+		/// <summary>
+		/// Gets an <see cref="IEnumerable{T}"/> of all connected Connections to the Server other than <paramref name="connection"/>.
+		/// </summary>
+		public IEnumerable<IConnection> OtherConnectionsThan(IConnection connection) =>
+			Connections.Where(x => x != connection);
+
+		/// <summary>
+		/// After the exit Command is entered, stop accepting new Connections.
+		/// This is just a cleanup.
+		/// </summary>
+		protected override void HandleAfterExit() => StopListening();
+
+		public override void RemoveConnection(IConnection connection)
+		{
+			connections.Remove(connection);
+		}
+
+		protected override void ClearConnections()
+		{
+			connections.Clear();
 		}
 
 		public void Handle(StartPortCommandArgument argument)
@@ -117,7 +136,7 @@ namespace PPchatServer
 		{
 			var (s_out, did_cut) = CutString(s, maxLength);
 			if (did_cut)
-				return string.Concat(s.Span, to_append_if_cut.Span).AsMemory();
+				return string.Concat(s_out.Span, to_append_if_cut.Span).AsMemory();
 			else
 				return s_out;
 		}

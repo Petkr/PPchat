@@ -3,6 +3,9 @@ using PPnetwork;
 
 namespace PPchatPackets
 {
+	/// <summary>
+	/// Packet used to send the username after connecting.
+	/// </summary>
 	[Serializable]
 	public readonly struct LoginPacket : IPacket
 	{

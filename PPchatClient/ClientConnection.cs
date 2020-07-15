@@ -5,9 +5,16 @@ using PPchatPackets;
 
 namespace PPchatClient
 {
+	/// <summary>
+	/// Connection for the Client.
+	/// </summary>
 	class ClientConnection : Connection<Client, ClientConnection>,
 		IPacketHandler<MessageForClientPacket>
 	{
+		/// <summary>
+		/// Creates a TcpClient and connects it to <paramref name="ipAddress"/> on <see cref="port"/>.
+		/// </summary>
+		/// <returns>A connected TcpClient</returns>
 		static TcpClient CreateClientAndConnect(IPAddress ipAddress, int port)
 		{
 			var client = new TcpClient();

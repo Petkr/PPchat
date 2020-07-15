@@ -8,7 +8,7 @@ using PPchatPackets;
 
 namespace PPchatClient
 {
-	public class Client : Application<Client>, IDisposable,
+	class Client : Application<Client>, IDisposable,
 		ICommandHandler<ChangePortCommandArgument>,
 		ICommandHandler<ConnectCommandArgument>,
 		ICommandHandler<DefaultConnectCommandArgument>,
@@ -21,20 +21,28 @@ namespace PPchatClient
 		ICommandHandler<SaveServerCommandArgument>,
 		ICommandHandler<ListSavedServersCommandArgument>
 	{
+		/// <summary>
+		/// The one connection to the server. Null if not connected.
+		/// </summary>
 		IConnection? connection;
-
 		bool Connected => connection != null;
 
+		/// <summary>
+		/// If the Client is connected returns an <see cref="IEnumerable{T}"/> with the Connection, otherwise an empty one.
+		/// </summary>
 		protected override IEnumerable<IConnection> Connections => connection?.AsSingleEnumerable() ?? Enumerable.Empty<IConnection>();
 
 		protected override string ExitMessage => "disconnecting because the client is shutting down";
 
+		// Settings
+		const string settingsPath = "settings";
 		int defaultPort;
-
-		const string dataPath = "data";
-
 		readonly IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> savedServers;
 
+		/// <summary>
+		/// Serializes <see cref="savedServers"/> to <paramref name="stream"/>.
+		/// </summary>
+		/// <param name="stream"></param>
 		void SerializeSavedServers(SimpleSerializerStream stream)
 		{
 			stream.Write(savedServers.Count);
@@ -45,6 +53,10 @@ namespace PPchatClient
 			}
 		}
 
+		/// <summary>
+		/// Deserializes the saved servers into an <see cref="IEnumerable{T}"/> of (name, (address, port))
+		/// </summary>
+		/// <returns>key-value pairs from the stream</returns>
 		static IEnumerable<(ReadOnlyMemory<char> key, (IPAddress, int) value)> DeserializeSavedServersImplementation(SimpleSerializerStream serializer)
 		{
 			int count;
@@ -67,6 +79,11 @@ namespace PPchatClient
 			}
 		}
 
+		/// <summary>
+		/// Deserializes the saved servers from <paramref name="stream"/>.
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <returns></returns>
 		static IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> DeserializeSavedServers(SimpleSerializerStream stream)
 		{
 			IDictionary<ReadOnlyMemory<char>, (IPAddress, int)> saved_servers =
@@ -80,7 +97,7 @@ namespace PPchatClient
 
 		public Client()
 		{
-			using var stream = new SimpleSerializerStream(new FileStream(dataPath, FileMode.OpenOrCreate));
+			using var stream = new SimpleSerializerStream(new FileStream(settingsPath, FileMode.OpenOrCreate));
 			try
 			{
 				defaultPort = stream.Read<int>();
@@ -92,30 +109,35 @@ namespace PPchatClient
 			savedServers = DeserializeSavedServers(stream);
 		}
 
+		/// <summary>
+		/// Dumps the settings on disk.
+		/// </summary>
 		public void Dispose()
 		{
-			File.Delete(dataPath);
-			using var stream = new SimpleSerializerStream(new FileStream(dataPath, FileMode.CreateNew));
+			File.Delete(settingsPath);
+			using var stream = new SimpleSerializerStream(new FileStream(settingsPath, FileMode.CreateNew));
 			stream.Write(defaultPort);
 			SerializeSavedServers(stream);
 		}
 
 		public override void RemoveConnection(IConnection _)
 		{
+			// the Client has only one Connection (at most)
 			connection = null;
 		}
 
+		/// <summary>
+		/// Changes the <see cref="defaultPort"/> to <paramref name="port"/>.
+		/// </summary>
 		internal void ChangePort(int port)
 		{
 			Write($"the default port was changed from: {defaultPort}, to: {port}");
 			defaultPort = port;
 		}
 
-		protected override void HandleAfterExit()
-		{}
-
 		protected override void ClearConnections()
 		{
+			// again, just one Connection
 			connection = null;
 		}
 
