@@ -8,7 +8,7 @@ The project consists of two applications:
 * PPchatClient
 * PPchatServer
 
-Both are console application that accept text-form commands with arguments.
+Both are console application that accept text-form commands via arguments.
 
 This project is very minimalistic and serves just as a demonstration of the capabilites of PPnetwork.
 
