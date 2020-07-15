@@ -1,4 +1,6 @@
-﻿# PPchat - špecifikácia
+# PPchat - špecifikácia
+
+2020 Peter Fačko
 
 ## Krátky popis
 
