@@ -8,7 +8,7 @@ The project consists of two applications:
 * PPchatClient
 * PPchatServer
 
-Both are console application that accept text-form commands with arguments.
+Both are console application that accept text-form commands via arguments.
 
 This project is very minimalistic and serves just as a demonstration of the capabilites of PPnetwork.
 
@@ -21,6 +21,17 @@ Tokens in input are separated with spaces not enclosed in double quotes.
 If a command has '*' after it's one argument, this means that everything after the command name
 in the input is treated as the argument.
 
+#### Example
+
+Suppose there are commands with signatures:
+* x argument1 argument2
+* y argument*
+
+Inputs will be parsed in the following way:
+* x abc defg - call to x with argument1 = "abc" and argument2 = "defg"
+* x abc - call to x with bad argument count
+* y abc defg - call to y with argument = "abc defg"
+
 ## The Client
 
 This is the client side of the project.
@@ -28,6 +39,19 @@ This is the client side of the project.
 The Client can connect to a server with an IP address and a port.
 
 Then it can send messages to other connected Clients.
+
+### Default Port
+
+The user can set a default port, which is used as default in some commands.
+
+This setting is saved on disk when the client closes.
+
+### Saved Servers
+
+The user can save some server addresses and ports under a custom name with
+[save](#save-address-port-server_name) command.
+
+This setting is saved on disk when the client closes.
 
 ### Commands
 
@@ -83,11 +107,6 @@ Prints all [saved servers](#Saved-Servers).
 #### say `message`*
 
 Sends `message` to the server, which sends it to other connected clients.
-
-### Connecting
-
-After connecting, the Client will request a username.
-This string is used by the server to refer to the Client during this session.
 
 ### Default Port
 
