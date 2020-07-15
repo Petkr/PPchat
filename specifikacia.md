@@ -6,7 +6,7 @@ Tri časti:
 
 0) PPparsing - (C++) knižnica na parsovanie jednoduchých príkazov s argumentami
 1) PPnetwork - knižnica pre vytváranie sieťových aplikácií
-2) PPchat - TCP klient-server aplikácia s jednoduchým "četovaním"
+2) PPchat - TCP klient-server projekt s jednoduchým "četovaním"
 
 ### PPparsing
 
