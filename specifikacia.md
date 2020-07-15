@@ -1,6 +1,6 @@
 # PPchat - špecifikácia
 
-2020 Peter Fačko
+Peter Fačko, 2020
 
 ## Krátky popis
 
