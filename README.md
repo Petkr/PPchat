@@ -40,6 +40,11 @@ The Client can connect to a server with an IP address and a port.
 
 Then it can send messages to other connected Clients.
 
+### Connecting
+
+After connecting, the Client will request a username.
+This string is used by the server to refer to the Client during this session.
+
 ### Default Port
 
 The user can set a default port, which is used as default in some commands.
@@ -108,19 +113,6 @@ Prints all [saved servers](#Saved-Servers).
 
 Sends `message` to the server, which sends it to other connected clients.
 
-### Default Port
-
-The user can set a default port, which is used as default in some commands.
-
-This setting is saved on disk when the client closes.
-
-### Saved Servers
-
-The user can save some server addresses and ports under a custom name with
-[save](#save-address-port-server_name) command.
-
-This setting is saved on disk when the client closes.
-
 ## The Server
 
 This is the server side of the project.
@@ -140,10 +132,6 @@ Starts the server and listens on port `port`.
 #### stop
 
 Stops the server.
-
-## Implementation Details
-
-[here](DETAILS)
 
 ## License
 
