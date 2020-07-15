@@ -21,6 +21,17 @@ Tokens in input are separated with spaces not enclosed in double quotes.
 If a command has '*' after it's one argument, this means that everything after the command name
 in the input is treated as the argument.
 
+#### Example
+
+Suppose there are commands with signatures:
+* x argument1 argument2
+* y argument*
+
+Inputs will be parsed in the following way:
+* x abc defg - call to x with argument1 = "abc" and argument2 = "defg"
+* x abc - call to x with bad argument count
+* y abc defg - call to y with argument = "abc defg"
+
 ## The Client
 
 This is the client side of the project.
